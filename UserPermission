@@ -21,7 +21,7 @@ namespace UserVerify
             string SqlCommandLine = "select " + ReturnColName + " from " + TableName + " where " + PermissionConditionString;
             SqlCommand cmd11 = new SqlCommand(SqlCommandLine, cn1);
             cmd11.Parameters.Clear();
-            cmd11.Parameters.Add("@UserID", SqlDbType.NVarChar).Value = UserID;
+            //cmd11.Parameters.Add("@UserID", SqlDbType.NVarChar).Value = UserID;
             if (PermissionConditionString.Length == 0)
                 PermissionConditionString = UserIDColName + "=" + UserID;
             else
