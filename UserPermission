@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
-
 namespace UserVerify
 {
     public class VerifyUser
@@ -16,36 +15,38 @@ namespace UserVerify
         public bool getUserVerify(string TableName, string ConnectionString,string UserIDColName, string ReturnColName, string PermissionConditionString)
         {
             string cnstr1 = ConfigurationManager.ConnectionStrings[ConnectionString].ConnectionString;
-            SqlConnection cn1 = new SqlConnection();
-            cn1.ConnectionString = cnstr1;
-            string SqlCommandLine = "select " + ReturnColName + " from " + TableName + " where " + PermissionConditionString;
-            SqlCommand cmd11 = new SqlCommand(SqlCommandLine, cn1);
-            cmd11.Parameters.Clear();
-            //cmd11.Parameters.Add("@UserID", SqlDbType.NVarChar).Value = UserID;
-            if (PermissionConditionString.Length == 0)
-                PermissionConditionString = UserIDColName + "=" + UserID;
-            else
-                PermissionConditionString = PermissionConditionString + " and " + UserIDColName + "=" + UserID;
-            
-            SqlDataAdapter da1 = new SqlDataAdapter (cmd11);
-            DataTable dt1 = new DataTable();
-            da1.Fill(dt1);
-            if (dt1.Rows.Count > 0)
+            using (SqlConnection cn1 = new SqlConnection())
             {
-                
-                for (int i = 0; i < dt1.Rows.Count;i++ )
+                cn1.ConnectionString = cnstr1;
+                string SqlCommandLine = "select " + ReturnColName + " from " + TableName + " where " + PermissionConditionString;
+                SqlCommand cmd11 = new SqlCommand(SqlCommandLine, cn1);
+                cmd11.Parameters.Clear();
+               // cmd11.Parameters.Add("@UserID", SqlDbType.NVarChar).Value = UserID;
+                if (PermissionConditionString.Length == 0)
+                    PermissionConditionString = UserIDColName + "=" + UserID;
+                else
+                    PermissionConditionString = PermissionConditionString + " and " + UserIDColName + "=" + UserID;
+
+                SqlDataAdapter da1 = new SqlDataAdapter(cmd11);
+                DataTable dt1 = new DataTable();
+                da1.Fill(dt1);
+                if (dt1.Rows.Count > 0)
                 {
-                   if (dt1.Columns[ReturnColName].DataType==System.Type.GetType("System.Int32"))
-                        PermissionLevel = dt1.Rows[i].Field < int > (ReturnColName).ToString();
-                   if (dt1.Columns[ReturnColName].DataType == System.Type.GetType("System.String"))
-                       PermissionLevel = dt1.Rows[i].Field<string>(ReturnColName).ToString(); 
+
+                    for (int i = 0; i < dt1.Rows.Count; i++)
+                    {
+                        if (dt1.Columns[ReturnColName].DataType == System.Type.GetType("System.Int32"))
+                            PermissionLevel = dt1.Rows[i].Field<int>(ReturnColName).ToString();
+                        if (dt1.Columns[ReturnColName].DataType == System.Type.GetType("System.String"))
+                            PermissionLevel = dt1.Rows[i].Field<string>(ReturnColName).ToString();
+                    }
+
+                    return true;
                 }
-                
-                return true;
-            }
-            else
-            {
-                return false;
+                else
+                {
+                    return false;
+                }
             }
         }
     
